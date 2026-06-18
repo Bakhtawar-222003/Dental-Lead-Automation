@@ -1,0 +1,332 @@
+{
+  "name": "Dental Clinic Lead Capture & Booking Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Enquiry Form",
+        "formDescription": "Apply for dental checkup",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name"
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email"
+            },
+            {
+              "fieldLabel": "Phone Number",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Treatment",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Root Canal"
+                  },
+                  {
+                    "option": "Aligners or Braces"
+                  },
+                  {
+                    "option": "Cavity filling"
+                  },
+                  {
+                    "option": "Teeth Whitening"
+                  },
+                  {
+                    "option": "Teeth Cleaning and Scaling"
+                  },
+                  {
+                    "option": "Cosmetic Dentistry"
+                  },
+                  {
+                    "option": "Pediatric Dentistry"
+                  },
+                  {
+                    "option": "Dental Implants"
+                  },
+                  {
+                    "option": "Emergency Consultancy"
+                  },
+                  {
+                    "option": "Other"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -672,
+        96
+      ],
+      "id": "0f4f75fa-04c9-4c29-b6aa-1e1d1896807f",
+      "name": "On form submission",
+      "webhookId": "REPLACE_WITH_NEW_WEBHOOK_ID"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "REPLACE_WITH_NEW_WEBHOOK_PATH",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -640,
+        272
+      ],
+      "id": "a8a4e674-4c57-4080-b5d3-25a2c84b9d49",
+      "name": "Webhook",
+      "webhookId": "REPLACE_WITH_NEW_WEBHOOK_ID"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "=Welcome to our Dental Clinic",
+        "emailType": "text",
+        "message": "=Hello {{ $json.Name }},  \n\nHope you are doing well. We recieved your appointment and it is successfully booked. Make sure to arrive in time.\n\nThank You!",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        336,
+        80
+      ],
+      "id": "64ced8f6-7a0a-45c2-bb41-8a964407db69",
+      "name": "Send a message",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "YOUR_GMAIL_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "95e0c39d-caab-400f-9eb9-9a7335906c52",
+              "name": "Name",
+              "value": "={{ $json.Name || $json.body.name }}",
+              "type": "string"
+            },
+            {
+              "id": "95ff14a6-4e73-4b39-9389-6b72916aca3b",
+              "name": "Email",
+              "value": "={{ $json.Email ||  $json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "dc53928f-0d04-4bbe-99c4-35a2babdf73e",
+              "name": "Phone Number",
+              "value": "={{ $json['Phone Number'] ||$json.body.phone  }}",
+              "type": "string"
+            },
+            {
+              "id": "04c21b31-c3cf-4e26-8b35-101152e3e73f",
+              "name": "Treatment",
+              "value": "={{ $json.Treatment || $json.body.treatment}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -384,
+        80
+      ],
+      "id": "905905e0-0841-4f79-9a79-31c81e2f6fe3",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Your Sheet Name",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.Name }}",
+            "Email": "={{ $json.Email }}",
+            "Phone No": "={{ $json['Phone Number'] }}",
+            "Treatment ": "={{ $json.Treatment }}",
+            "Lead Status": "={{ $json.LeadStatus }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone No",
+              "displayName": "Phone No",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Treatment ",
+              "displayName": "Treatment ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lead Status",
+              "displayName": "Lead Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        112,
+        80
+      ],
+      "id": "881c5671-5537-420e-b14e-25c17999bbba",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "YOUR_GOOGLE_SHEETS_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nfunction isValidEmail(email) {\n  return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email || \"\");\n}\n\nfunction isValidPakPhone(phone) {\n  if (!phone) return false;\n\n  phone = phone.toString().replace(/[\\s\\-()]/g, \"\");\n\n  // normalize allowed patterns\n  if (phone.startsWith(\"3\") && phone.length === 10) return true;\n  if (phone.startsWith(\"92\") && phone.length >= 12) return true;\n  if (phone.startsWith(\"03\") && phone.length >= 11) return true;\n\n  return false;\n}\n\nreturn items.map(item => {\n  const email = item.json.Email || item.json.email;\n  const phone = item.json[\"Phone Number\"] || item.json.phone;\n  const name = item.json.Name || item.json.name;\n\n  let status = \"Fake Lead\";\n\n  // basic validation rules\n  if (\n    name &&\n    name.length >= 2 &&\n    isValidEmail(email) &&\n    isValidPakPhone(phone)\n  ) {\n    status = \"Genuine Lead\";\n  }\n\n  return {\n    json: {\n      ...item.json,\n      LeadStatus: status\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -128,
+        80
+      ],
+      "id": "9b9c4e08-c330-41c0-9131-22af26a51b3d",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "tags": []
+}
